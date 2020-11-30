@@ -1,0 +1,19 @@
+quickstart:
+
+cd ~/src/afni/src
+export C_INCLUDE_PATH=${PWD}/niml:${C_INCLUDE_PATH}
+make 3dcalc
+make 3dvolreg
+make 3dFWHMx
+3dLFCD
+3dECM
+...
+
+Issues:
+ 1. libpython*.dylib not native
+ 2. gcc not yet available (use Clang)
+ 3. OpenMP not yet available
+ 4. Unable to install lXpm as native library
+ 5. Motif must be installed as native library
+     export ARCHFLAGS='-arch arm64'
+     brew install -s motif

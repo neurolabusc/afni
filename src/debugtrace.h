@@ -74,6 +74,9 @@ extern int NI_clock_time(void) ;  /* 19 Jun 2019 */
 #include <signal.h>
 #include <unistd.h>
 #include <stdio.h>
+#if defined(__clang__)	   
+   #include <string.h>
+#endif
 
 #ifdef  __cplusplus
 extern "C" {

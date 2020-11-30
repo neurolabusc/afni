@@ -1,4 +1,7 @@
 #include "cs.h"
+#if defined(__clang__)	   
+   #include <string.h>
+#endif
 
 /********************************************************************************/
 /* insertion_sort : sort an array of string + void*                             */
