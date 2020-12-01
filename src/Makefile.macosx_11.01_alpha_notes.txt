@@ -5,15 +5,37 @@ export C_INCLUDE_PATH=${PWD}/niml:${C_INCLUDE_PATH}
 make 3dcalc
 make 3dvolreg
 make 3dFWHMx
-3dLFCD
-3dECM
+make afni
 ...
 
 Issues:
- 1. libpython*.dylib not native
- 2. gcc not yet available (use Clang)
- 3. OpenMP not yet available
- 4. Unable to install lXpm as native library
- 5. Motif must be installed as native library
-     export ARCHFLAGS='-arch arm64'
-     brew install -s motif
+ Some features are not available (see https://github.com/Homebrew/brew/issues/7857 for updates)
+  1. libpython*.dylib not native (makefile does not define "LDPYTHON" but this is not used by most applications)
+  2. gcc not yet available (use Clang)
+  3. OpenMP not yet available
+ Some libraries will need to be generated
+  1. Unable to install lXpm as native library
+      export ARCHFLAGS='-arch arm64'
+      brew install -s libxpm
+	 Creates files in "/opt/homebrew/Cellar/libxpm"
+  2. Motif must be installed as native library
+      export ARCHFLAGS='-arch arm64'
+      brew install -s motif
+	 Creates files in "/opt/local/include" and "/opt/local/lib"
+  3. Suma requires glib must be installed as native library. This will require python3.9, which is not yet available for the M1
+      export ARCHFLAGS='-arch arm64'
+      brew install -s glib
+	 Creates files in "/opt/local/include" and "/opt/local/lib"
+  4. files in ./avovk (e.g. 3dkmeans) require gsl
+      export ARCHFLAGS='-arch arm64'
+      brew install -s gsl
+	 Creates files in "/opt/homebrew/Cellar/gsl/2.6/include" and "/opt/homebrew/Cellar/gsl/2.6/lib"
+  5. while the headers are not required to compile "vastness", AFNI wants to copy these libraries to the executable folder - perhaps they are used?	
+    export ARCHFLAGS='-arch arm64'
+	brew install -s freetype
+    brew install -s glib
+  6. brew is unable to create several libraries that the AFNI makefile wants to copy. It is unclear if these are linked to any executables:
+	cp: /usr/local/lib/gcc/8/lib/libgcc_s.1.dylib: No such file or directory
+	cp: /usr/local/lib/libglib-2.0.0.dylib: No such file or directory
+	cp: /usr/local/lib/libbz2.1.dylib: No such file or directory
+	cp: /usr/local/lib/libintl.8.dylib: No such file or directory

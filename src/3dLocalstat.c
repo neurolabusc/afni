@@ -4,6 +4,10 @@
 #include "mri_nstats.c"
 #endif
 
+#if defined(__clang__)	   
+#include "mri_nstats.c"
+#endif
+
 /* #defines moved to editvol.h */
 
 /*-----------------------------------------------------------------------*/

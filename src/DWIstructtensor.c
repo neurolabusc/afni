@@ -26,9 +26,14 @@
    #define INLINE   /**/
 #endif
 
+#if defined(__clang__)	   
+   #include "thd_coords.c"
+#endif
+
 #include "thd_shear3d.h"
 #include "matrix.h"
 #include "mrilib.h"
+
 
 #define TINYNUMBER 1E-10
 #define SMALLNUMBER 1E-4

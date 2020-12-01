@@ -25,6 +25,16 @@ ALLO = color.o curve.o frame.o frstpt.o labmod.o memplt.o    \
 # RM     = /bin/rm -f
 # LFLAGS = -s -L. -L.. -L/usr/X11R6/lib -lcoxplot -lf2c \
 #          -lXm -lXp -lXpm -lXext -lXmu -lXt -lX11 -lm
+ifneq ($(OS),Windows_NT)
+	OS = $(shell uname)
+	ifeq "$(OS)" "Darwin"
+		XROOT   = /opt/local
+		XROOT_I = -I$(XROOT)/include
+		XROOT_L = -L$(XROOT)/lib
+		IFLAGS =$(XROOT_I)
+		LFLAGS =$(XROOT_L)
+	endif
+endif
 
 libcoxplot.a:$(ALLO) coxplot.h
 	$(RM) $@
@@ -45,7 +55,7 @@ clean:
 
 .c.o:
 	$(RM) $@
-	$(CC) -c $*.c -I. -I.. $(IFLAGS)
+	$(CC) -c $*.c -I../f2c -I../rickr -I../nifti/nifticdf -I../nifti/nifti2 -I../nifti/znzlib -I. -I.. $(IFLAGS)
 
 # dependencies
 

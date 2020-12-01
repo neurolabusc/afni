@@ -9,6 +9,14 @@
      #include <omp.h>
      #endif
 ***/
+#if defined(__aarch64__) 
+     #undef USE_OMP
+     //Apple M1 does not yet support OpenMP
+
+     int omp_get_thread_num() { 
+         return 0;
+     }
+#endif
 
 typedef struct {
   int meth ;
@@ -775,6 +783,7 @@ void INCOR_addto_2Dhist( INCOR_2Dhist *tdh , int n , float *x , float *y , float
 #  define use_omp 0
 #  define nthr    1
 #endif
+
 
 ENTRY("INCOR_addto_2Dhist") ;
 

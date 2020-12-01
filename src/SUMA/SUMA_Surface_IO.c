@@ -2,6 +2,10 @@
 #include "SUMA_suma.h"
 #include "PLY/ply.h"
 
+#if defined(__clang__)	
+#include "../mcw_malloc.c"
+#endif
+
 /*!
    \brief a function to simplify loading surfaces the old way
    The only difference with SUMA_Load_Surface_Object_eng is that it 
