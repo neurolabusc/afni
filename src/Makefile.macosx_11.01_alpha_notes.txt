@@ -2,11 +2,7 @@ quickstart:
 
 cd ~/src/afni/src
 export C_INCLUDE_PATH=${PWD}/niml:${C_INCLUDE_PATH}
-make 3dcalc
-make 3dvolreg
-make 3dFWHMx
-make afni
-...
+make vastness
 
 Issues:
  Some features are not available (see https://github.com/Homebrew/brew/issues/7857 for updates)
@@ -25,17 +21,42 @@ Issues:
   3. Suma requires glib must be installed as native library. This will require python3.9, which is not yet available for the M1
       export ARCHFLAGS='-arch arm64'
       brew install -s glib
-	 Creates files in "/opt/local/include" and "/opt/local/lib"
+	 Creates files in "/opt/homebrew/Cellar/glib/2.66.2_1/include" and "/opt/homebrew/Cellar/glib/2.66.2_1/lib"
   4. files in ./avovk (e.g. 3dkmeans) require gsl
       export ARCHFLAGS='-arch arm64'
       brew install -s gsl
 	 Creates files in "/opt/homebrew/Cellar/gsl/2.6/include" and "/opt/homebrew/Cellar/gsl/2.6/lib"
-  5. while the headers are not required to compile "vastness", AFNI wants to copy these libraries to the executable folder - perhaps they are used?	
+  5. Suma requires libGLU and libGL. The versions included with XQuartz (2.7.11, /opt/X11/lib/libGLU.dylib and /opt/X11/lib/libGL.dylib) are not ARM native.
+      export ARCHFLAGS='-arch arm64'
+      brew install -s libGLU       
+	 Creates libGLU.dylib in "/opt/homebrew/Cellar/mesa-glu/9.0.1/include" and "/opt/homebrew/Cellar/mesa-glu/9.0.1/lib" 
+	 It also creates libGL.dylib in "/opt/homebrew/opt/mesa/include" and "/opt/homebrew/opt/mesa/lib"
+  5. Suma requires <X11/XInput.h>:
+      export ARCHFLAGS='-arch arm64'
+	  brew install -s libxi
+	 Creates files in "/opt/homebrew/Cellar/libxi/1.7.10/include" and "/opt/homebrew/Cellar/libxi/1.7.10/lib"
+  6. while the headers are not required to compile "vastness", AFNI wants to copy these libraries to the executable folder - perhaps they are dependencies?	
     export ARCHFLAGS='-arch arm64'
 	brew install -s freetype
     brew install -s glib
-  6. brew is unable to create several libraries that the AFNI makefile wants to copy. It is unclear if these are linked to any executables:
+  7. brew is unable to create several libraries that the AFNI makefile wants to copy. It is unclear if these are linked to any executables:
 	cp: /usr/local/lib/gcc/8/lib/libgcc_s.1.dylib: No such file or directory
 	cp: /usr/local/lib/libglib-2.0.0.dylib: No such file or directory
 	cp: /usr/local/lib/libbz2.1.dylib: No such file or directory
 	cp: /usr/local/lib/libintl.8.dylib: No such file or directory
+
+OpenMP
+ OpenMP has been disabled. In my limited experience clang+OpenMP performs poorly (uses multiple CPUs, but does not provide much acceleration) regardless of architecture, unlike gcc+OpenMP, clang+pThreads, gcc+pThreads. However, it is possible to compile OpenMP for the Apple ARM CPUs:
+ 1. Build a universal library with the commands. This should work with the latest gihub release:
+ 
+git clone https://github.com/llvm/llvm-project.git
+cd llvm-project/openmp; mkdir build; cd build 
+cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES='arm64;x86_64' .. 
+make install
+
+(Alternatively, you could get the stable LLVM 11.0.0 https://releases.llvm.org/download.html OpenMP Source code. However,you will need to patch the file z_Linux_asm.S to get this library to work.)
+ 2. Compilation should include "-Xclang -fopenmp -lomp  (https://mac.r-project.org/openmp/).
+ 3. The file thd_incorrelate.c contains a conditional to disable OpenMP on ARM64, you will need to remove this clause (#if defined(__aarch64__)...)
+ 
+
+

@@ -17,8 +17,11 @@ USE_ZLIB  = -DHAVE_ZLIB
 LZLIB     = -lz
 USE_GIFTI = -DHAVE_GIFTI
 LGIFTI    = -lexpat
-#LXPM    = -lXpm
-LXPM    = 
+LXPM    = -lXpm
+XMROOT   = /opt/homebrew/Cellar/libxpm/3.5.13
+XMROOT_I = -I$(XMROOT)/include
+XMROOT_L = -L$(XMROOT)/lib
+
 
 # ------------------------------
 # python from C
@@ -40,6 +43,33 @@ LDPYTHON    =
 XROOT   = /opt/local
 XROOT_I = -I$(XROOT)/include
 XROOT_L = -L$(XROOT)/lib
+
+#X11 only has x86-64 libraries...
+# GLROOT   = /opt/X11
+GLROOT   = /opt/homebrew/opt/mesa
+GLROOT_I = -I$(GLROOT)/include
+GLROOT_L = -L$(GLROOT)/lib
+
+
+GLBROOT   = /opt/homebrew/Cellar/glib/2.66.2_1
+GLBROOT_I = -I$(GLBROOT)/include
+GLBROOT_L = -L$(GLBROOT)/lib
+
+GSLROOT   = /opt/homebrew/Cellar/gsl/2.6
+GSLROOT_I = -I$(GSLROOT)/include
+GSLROOT_L = -L$(GSLROOT)/lib
+
+GLUROOT   = /opt/homebrew/Cellar/mesa-glu/9.0.1
+GLUROOT_I = -I$(GLUROOT)/include
+GLUROOT_L = -L$(GLUROOT)/lib
+
+#glut_input.c still requires the X11 <X11/XInput.h> from libXi 
+XIROOT   = /opt/homebrew/Cellar/libxi/1.7.10
+XIROOT_I = -I$(XIROOT)/include
+XIROOT_L = -L$(XIROOT)/lib
+
+
+
 
 XLIBS = -lXm -ljpeg.9 -lXt
 
@@ -64,27 +94,32 @@ INSTALLDIR = $(SYSTEM_NAME)
 
 #CR no libpython yet
 #/opt/lib/python2.7/config/libpython2.7.dylib \
+#CR no openMP
+#/usr/local/lib/gcc/8/lib/libgomp.1.dylib		  \
+# /usr/local/lib/libbz2.1.dylib	
+# /usr/local/lib/libintl.8.dylib
+
+			  
 		      
 EXTRA_INSTALL_FILES = /opt/local/lib/libXm.4.dylib			  \
 		      /opt/local/lib/libjpeg.9.dylib			  \
 		      /opt/local/lib/libiconv.2.dylib			  \
-		      /usr/local/lib/gcc/8/lib/libgcc_s.1.dylib		  \
-		      /usr/local/lib/libglib-2.0.0.dylib		  \
-		      /usr/local/lib/libgsl.0.dylib			  \
-		      /usr/local/lib/libgslcblas.0.dylib		  \
-		      /usr/local/lib/gcc/8/lib/libgomp.1.dylib		  \
-		      /usr/local/lib/freetype219/lib/libfreetype.6.dylib \
-		      /usr/local/lib/libpng16.16.dylib			  \
-		      /usr/local/lib/libbz2.1.dylib			  \
-		      /usr/local/lib/libintl.8.dylib
+		      /opt/homebrew/Cellar/glib/2.66.2_1/lib/libglib-2.0.dylib		  \
+		      /opt/homebrew/Cellar/gsl/2.6/lib/libgsl.dylib			  \
+		      /opt/homebrew/Cellar/gsl/2.6/lib/libgslcblas.dylib		  \
+		      /opt/homebrew/Cellar/freetype/2.10.4/lib/libfreetype.dylib \
+		      /opt/homebrew/opt/mesa/lib/libGL.dylib \
+			  /opt/homebrew/Cellar/mesa-glu/9.0.1/lib/libGLU.dylib \
+		     /opt/homebrew/Cellar/libpng/1.6.37/lib/libpng.dylib
+		      
 
 EXTRA_INSTALL_COMMANDS = ( cd $(INSTALLDIR) ;                                 \
                            chmod u+w *.dylib ;                                \
                            if [ -d $(HOME)/EXTRAPROGS ]; then $(CP) $(HOME)/EXTRAPROGS/* . ; fi ; )
 
-IFLAGS = -I. $(XROOT_I) -I/usr/include
+IFLAGS = -I. $(XROOT_I) $(XMROOT_I) $(GLROOT_I) $(GLUROOT_I) $(GLBROOT_I) $(GSLROOT_I) $(XROOT_I) -I/usr/include
          
-LFLAGS = -L. $(XROOT_L) -L/usr/lib -L/usr/lib -Wl,-x -Wl,-multiply_defined -Wl,warning -Wl,-bind_at_load $(LPYTHON)
+LFLAGS = -L. $(XROOT_L) $(XMROOT_L) $(GLROOT_L) $(GLUROOT_L) $(GLBROOT_L) $(GSLROOT_L) $(XROOT_L) -L/usr/lib -L/usr/lib -Wl,-x -Wl,-multiply_defined -Wl,warning -Wl,-bind_at_load $(LPYTHON)
 
 CCSVD  = $(CCMIN) -m64 -O0
 
@@ -117,8 +152,7 @@ INSTALL_PREREQ = suma_gts
 # GSLPROGS = balloon
 EXPROGS = $(GSLPROGS)
 
-# for dynamic linking
-# CR  
+# for dynamic linking 
 LLIBS  = -lmri -lf2c $(XLIBS) -lXft -lfontconfig \
          -lpng16 -liconv -lXmu -lXp -lXext -lX11      \
          $(LZLIB) $(LGIFTI) $(LDPYTHON) $(LXPM) -lm -lc
@@ -141,10 +175,10 @@ GLw_LIB = libGLws.a
 
 
 SUMA_GLIB_VER = -2.0
-SUMA_INCLUDE_PATH = $(GLw_IPATH) -I.. -I../niml $(IFLAGS) -Igts/src -I${usr_ROOT}/lib/glib-2.0/include -I${usr_ROOT}/include/glib-2.0 
+SUMA_INCLUDE_PATH = $(GLw_IPATH) -I.. -I../niml $(IFLAGS) -Igts/src -I${usr_ROOT}/lib/glib-2.0/include -I${usr_ROOT}/include/glib-2.0  $(XIROOT_I)
 SUMA_LINK_PATH = $(XROOT_L) $(LFLAGS) -L..
 
-SUMA_LINK_LIB = $(XLIBS) $(GLw_LIB) $(LLIBS) -lGLU -lGL -lmri -lf2c -lmx -L${usr_ROOT}/lib/ -lglib-2.0 $(SUMA_GL_DYLIB_CMD)
+SUMA_LINK_LIB = $(XLIBS) $(GLw_LIB) $(LLIBS) -lGLU -lGL -lmri -lf2c -lmx -L${usr_ROOT}/lib/ -lglib-2.0  $(XIROOT_L) $(SUMA_GL_DYLIB_CMD)
 SUMA_MAKEFILE_NAME = SUMA_Makefile
 SUMA_BIN_ARCHIVE = SUMA_MacOSX.tar
 SUMA_MDEFS = 
