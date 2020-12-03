@@ -3,8 +3,13 @@
 #include "PLY/ply.h"
 
 #if defined(__clang__)	
-#include "../mcw_malloc.c"
+//#include "../mcw_malloc.h"
+//#import <../mcw_malloc.h>
+extern void   pause_mcw_malloc(void);
+extern void   resume_mcw_malloc(void);
+extern int    mcw_malloc_paused(void);
 #endif
+
 
 /*!
    \brief a function to simplify loading surfaces the old way

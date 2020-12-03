@@ -3,6 +3,7 @@
 
 #define SUMA_FS_ANNOT_TAG_COLORTABLE   1
 #define SUMA_FS_STRLEN 50
+
 typedef struct {
    int i;
    int r;

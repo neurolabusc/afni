@@ -45,6 +45,11 @@ Issues:
 	cp: /usr/local/lib/libbz2.1.dylib: No such file or directory
 	cp: /usr/local/lib/libintl.8.dylib: No such file or directory
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	OMPFLAGC =-fx
+	OMPFLAG = 
+endif()
+
 OpenMP
  OpenMP has been disabled. In my limited experience clang+OpenMP performs poorly (uses multiple CPUs, but does not provide much acceleration) regardless of architecture, unlike gcc+OpenMP, clang+pThreads, gcc+pThreads. However, it is possible to compile OpenMP for the Apple ARM CPUs:
  1. Build a universal library with the commands. This should work with the latest gihub release:
@@ -56,7 +61,7 @@ make install
 
 (Alternatively, you could get the stable LLVM 11.0.0 https://releases.llvm.org/download.html OpenMP Source code. However,you will need to patch the file z_Linux_asm.S to get this library to work.)
  2. Compilation should include "-Xclang -fopenmp -lomp  (https://mac.r-project.org/openmp/).
- 3. The file thd_incorrelate.c contains a conditional to disable OpenMP on ARM64, you will need to remove this clause (#if defined(__aarch64__)...)
+ 3. The file thd_incorrelate.c contains a conditional to disable OpenMP on ARM64, you will need to remove this clause (#if defined(__aarch64__)...), you will also want to adjust the file Makefile.ptaylor.INCLUDE
  
 
 

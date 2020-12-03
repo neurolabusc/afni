@@ -21,6 +21,9 @@
 #include "DoTrackit.h"
 #include "checks_and_balances.h"
 #include "rsfc.h"
+#if defined(__clang__)	   
+ #include "../afni.h"
+#endif
 
 void usage_SpaceTimeCorr(int detail) 
 {
